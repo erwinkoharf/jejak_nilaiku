@@ -1,0 +1,1364 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jejak Nilaiku</title>
+<style>
+  :root{
+    --bg: #F5F8F7;
+    --ink: #16323A;
+    --ink-soft: #4A6169;
+    --trail: #0F4C5C;
+    --trail-light: #E7F0EE;
+    --amber: #E0A72E;
+    --amber-deep: #B9821F;
+    --line: #D7E2E0;
+    --card: #FFFFFF;
+    --danger: #C0455B;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    padding: 28px 16px 60px;
+  }
+  .wrap{max-width:1080px;margin:0 auto;}
+
+  /* HERO */
+  .hero{
+    background: linear-gradient(135deg, var(--trail) 0%, #163E4A 100%);
+    border-radius: 20px;
+    padding: 36px 32px 28px;
+    color: #EAF4F1;
+    position: relative;
+    overflow:hidden;
+    margin-bottom: 22px;
+  }
+  .hero h1{
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: clamp(28px, 5vw, 42px);
+    margin: 0 0 6px;
+    letter-spacing: 0.3px;
+  }
+  .hero p.sub{
+    margin:0 0 26px;
+    font-size: 15px;
+    color: #BFDAD3;
+    font-style: italic;
+  }
+  .trail-row{
+    display:flex;
+    align-items:center;
+    gap: 4px;
+    flex-wrap: wrap;
+  }
+  .trail-node{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:6px;
+    min-width: 54px;
+  }
+  .footprint{
+    width: 26px; height: 26px;
+    border-radius: 50%;
+    background: rgba(234,244,241,0.14);
+    border: 1.5px solid rgba(234,244,241,0.55);
+    display:flex; align-items:center; justify-content:center;
+    font-size: 12px; font-weight:600;
+    color:#EAF4F1;
+  }
+  .trail-node.active .footprint{
+    background: var(--amber);
+    border-color: var(--amber);
+    color: #16323A;
+  }
+  .trail-node span{font-size:11px; color:#BFDAD3;}
+  .trail-dash{flex:1; height:0; border-top: 2px dashed rgba(234,244,241,0.35); margin: 0 2px; margin-bottom: 20px; min-width:14px;}
+
+  /* CARD */
+  .card{
+    background: var(--card);
+    border-radius: 16px;
+    padding: 24px 26px;
+    margin-bottom: 20px;
+    box-shadow: 0 1px 3px rgba(15,76,92,0.08);
+    border: 1px solid var(--line);
+  }
+  .card h2{
+    font-family: Georgia, serif;
+    font-size: 19px;
+    margin: 0 0 4px;
+    color: var(--trail);
+  }
+  .card p.hint{
+    margin: 0 0 18px;
+    font-size: 13px;
+    color: var(--ink-soft);
+  }
+
+  /* IDENTITY */
+  .id-grid{
+    display:grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 14px;
+  }
+  .field label{
+    display:block;
+    font-size: 12.5px;
+    color: var(--ink-soft);
+    margin-bottom: 5px;
+    font-weight:600;
+  }
+  .field input, .field select{
+    width:100%;
+    padding: 9px 11px;
+    border-radius: 8px;
+    border: 1.4px solid var(--line);
+    font-size: 14px;
+    color: var(--ink);
+    background: #FCFEFD;
+  }
+  .field input:focus, .field select:focus{outline: 2px solid var(--trail); outline-offset:1px; border-color:var(--trail);}
+  .req{color: var(--danger); font-weight:800;}
+  .field input.field-error, .field select.field-error{border-color: var(--danger); background: #FBE9EC;}
+  #identity-warning{
+    font-size: 12.5px;
+    font-weight:600;
+    color: var(--danger);
+    margin-top: 10px;
+    min-height: 18px;
+  }
+
+  /* TABLE */
+  .table-scroll{overflow-x:auto; border-radius:10px; border:1px solid var(--line);}
+  table{border-collapse: collapse; width:100%; min-width: 760px;}
+  th, td{
+    border: 1px solid var(--line);
+    padding: 8px 6px;
+    text-align:center;
+    font-size: 13px;
+  }
+  thead tr.subject-row th{
+    color: #fff;
+    font-weight:700;
+    font-size: 12.5px;
+    padding: 10px 6px;
+  }
+  thead tr.label-row th{
+    background: var(--trail-light);
+    color: var(--trail);
+    font-size: 11.5px;
+  }
+  tbody td.rowlabel{
+    background: #FBFCFB;
+    font-weight:600;
+    color: var(--ink-soft);
+    white-space:nowrap;
+  }
+  td input[type=number]{
+    width: 58px;
+    padding: 5px 4px;
+    border-radius: 6px;
+    border: 1.2px solid var(--line);
+    text-align:center;
+    font-size: 13px;
+  }
+  td input[type=number]:focus{outline: 2px solid var(--trail);}
+  tr.summary td{
+    background: var(--trail-light);
+    font-weight:700;
+    color: var(--trail);
+  }
+  tr.summary td.rowlabel{background: #CFE4E0;}
+  tr.final td{
+    background: var(--amber);
+    color: #16323A;
+    font-weight:800;
+    font-size: 14.5px;
+  }
+  .note{
+    margin-top:10px;
+    font-size: 12px;
+    color: var(--ink-soft);
+  }
+  .note b{color:var(--danger);}
+
+  /* SIMULATION */
+  .sim-grid{
+    display:grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+  .sim-box{
+    background: var(--trail-light);
+    border-radius: 12px;
+    padding: 16px;
+    border: 1px solid var(--line);
+  }
+  .sim-box label{
+    display:block;
+    font-size: 12.5px;
+    font-weight:700;
+    color: var(--trail);
+    margin-bottom: 8px;
+  }
+  .sim-box input{
+    width:100%;
+    padding: 9px 10px;
+    border-radius: 8px;
+    border: 1.4px solid var(--line);
+    font-size: 15px;
+    background:#fff;
+  }
+  .sim-box input[readonly]{background:#EFF5F4; color:var(--ink-soft); font-weight:700;}
+  .weight-tag{
+    display:inline-block;
+    margin-top:8px;
+    font-size: 11px;
+    color: var(--ink-soft);
+    background:#fff;
+    border-radius:6px;
+    padding: 2px 8px;
+    border:1px solid var(--line);
+  }
+  .result-box{
+    background: linear-gradient(135deg, var(--trail), #163E4A);
+    color:#EAF4F1;
+    border-radius: 14px;
+    padding: 20px 22px;
+    display:flex;
+    flex-wrap:wrap;
+    gap: 24px;
+    align-items:center;
+    justify-content:space-between;
+  }
+  .result-box .big{
+    font-size: 34px;
+    font-weight:800;
+    color: var(--amber);
+    font-family: Georgia, serif;
+  }
+  .result-box .label{font-size:12.5px; color:#BFDAD3; margin-bottom:4px;}
+  .target-row{
+    margin-top: 18px;
+    padding-top: 16px;
+    border-top: 1px dashed var(--line);
+  }
+  .target-hint{margin-bottom: 10px;}
+  .target-row .flex{
+    display:flex;
+    gap:14px;
+    flex-wrap:wrap;
+    align-items:flex-end;
+  }
+  .target-row .field{flex: 1; min-width: 180px;}
+  #target-result{
+    margin-top: 12px;
+    font-size: 14px;
+    font-weight:600;
+    min-height: 20px;
+  }
+  #target-result.ok{color:#1f9e6d;}
+  #target-result.warn{color:var(--danger);}
+
+  .reset-btn{
+    display:inline-block;
+    margin-top: 4px;
+    background:none;
+    border: 1.4px solid var(--line);
+    color: var(--ink-soft);
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    cursor:pointer;
+  }
+  .reset-btn:hover{border-color:var(--trail); color:var(--trail);}
+
+  .tka-row{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap: 10px;
+    margin-bottom: 8px;
+  }
+  .tka-row label{
+    font-size: 13px;
+    font-weight:600;
+    color: var(--ink);
+    margin:0;
+  }
+  .tka-row input{
+    width: 90px;
+    padding: 7px 8px;
+    border-radius: 7px;
+    border: 1.4px solid var(--line);
+    text-align:center;
+    font-size: 14px;
+    background:#fff;
+  }
+  .tka-avg{
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px dashed var(--line);
+    font-size: 13.5px;
+    font-weight:700;
+    color: var(--trail);
+    display:flex;
+    justify-content:space-between;
+  }
+  .tka-avg span{color: var(--amber-deep); font-size:16px;}
+
+  .school-row{
+    display:grid;
+    grid-template-columns: 1.4fr 1fr 1.2fr;
+    align-items:center;
+    gap: 10px;
+    padding: 10px 4px;
+    border-bottom: 1px solid var(--line);
+  }
+  .school-row:last-child{border-bottom:none;}
+  .school-name{font-size:13.5px; font-weight:700; color:var(--ink);}
+  .school-range{font-size:12.5px; color:var(--ink-soft);}
+  .school-status{
+    font-size: 12.5px;
+    font-weight:700;
+    padding: 4px 8px;
+    border-radius: 6px;
+    text-align:center;
+  }
+  .school-status.ok{background:#E3F5EC; color:#1f9e6d;}
+  .school-status.warn{background:#FBE9EC; color:var(--danger);}
+  .school-status.neutral{background:#EFF5F4; color:var(--ink-soft);}
+
+  .special-school-block{
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 14px 16px;
+    margin-bottom: 14px;
+  }
+  .special-school-block:last-child{margin-bottom:0;}
+  .special-school-name-row{
+    display:flex;
+    align-items:center;
+    gap: 10px;
+    flex-wrap:wrap;
+    margin-bottom: 2px;
+  }
+  .special-school-name{
+    font-size: 14.5px;
+    font-weight:800;
+    color: var(--trail);
+  }
+  .garuda-badge{
+    display:inline-block;
+    font-size: 10.5px;
+    font-weight:700;
+    color: #16323A;
+    background: var(--amber);
+    padding: 3px 9px;
+    border-radius: 999px;
+    white-space:nowrap;
+  }
+  .special-school-block .school-website-link{
+    display:block;
+    margin-bottom: 10px;
+  }
+  .school-website-link{
+    display:inline-block;
+    font-size: 11.5px;
+    color: var(--amber-deep);
+    text-decoration: underline;
+    margin-top: 2px;
+  }
+  .reference-box{
+    background: var(--trail-light);
+    border-radius: 12px;
+    padding: 14px 16px;
+    margin-bottom: 16px;
+    font-size: 12.5px;
+    color: var(--ink);
+    line-height:1.6;
+  }
+  .reference-box a{
+    color: var(--trail);
+    font-weight:700;
+    text-decoration: underline;
+  }
+  .jalur-row{
+    padding: 10px 12px;
+    border-radius: 9px;
+    background: #FBFCFB;
+    border: 1px solid var(--line);
+    margin-bottom: 8px;
+  }
+  .jalur-row:last-child{margin-bottom:0;}
+  .jalur-top{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap: 10px;
+    flex-wrap:wrap;
+  }
+  .jalur-label{font-size:13px; font-weight:700; color:var(--ink);}
+  .jalur-status{
+    font-size: 12px;
+    font-weight:700;
+    padding: 3px 9px;
+    border-radius: 6px;
+  }
+  .jalur-status.ok{background:#E3F5EC; color:#1f9e6d;}
+  .jalur-status.warn{background:#FBE9EC; color:var(--danger);}
+  .jalur-status.neutral{background:#EFF5F4; color:var(--ink-soft);}
+  .jalur-detail{
+    font-size: 11.5px;
+    color: var(--ink-soft);
+    margin-top: 6px;
+  }
+  .fail-list{
+    margin: 6px 0 0;
+    padding-left: 18px;
+    font-size: 11.5px;
+    color: var(--danger);
+  }
+  .fail-list li{margin-bottom:2px;}
+  .soft-note{
+    font-size: 11.5px;
+    color: var(--ink-soft);
+    margin-top: 6px;
+    font-style: italic;
+  }
+
+  .tka-row.extra-row{
+    display:flex;
+    align-items:center;
+    gap: 6px;
+  }
+  .tka-row.extra-row input[type=text]{
+    flex: 1;
+    padding: 7px 8px;
+    border-radius: 7px;
+    border: 1.4px solid var(--line);
+    font-size: 13px;
+    background:#fff;
+  }
+  .tka-row.extra-row input[type=number]{
+    width: 74px;
+    flex-shrink:0;
+  }
+  .remove-mapel-btn{
+    flex-shrink:0;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    border: 1.4px solid var(--line);
+    background:#fff;
+    color: var(--danger);
+    font-size: 15px;
+    line-height:1;
+    cursor:pointer;
+  }
+  .remove-mapel-btn:hover{background:#FBE9EC; border-color:var(--danger);}
+  .add-mapel-btn{
+    width:100%;
+    margin-top: 10px;
+    padding: 8px 10px;
+    border-radius: 8px;
+    border: 1.4px dashed var(--trail);
+    background: transparent;
+    color: var(--trail);
+    font-size: 12.5px;
+    font-weight:700;
+    cursor:pointer;
+  }
+  .add-mapel-btn:hover{background: var(--trail-light);}
+
+  .strategy-intro{
+    background: var(--trail-light);
+    border-radius: 12px;
+    padding: 14px 16px;
+    font-size: 13.5px;
+    color: var(--ink);
+    margin-bottom: 16px;
+    line-height:1.6;
+  }
+  .strategy-item{
+    display:flex;
+    gap: 12px;
+    padding: 14px 4px;
+    border-bottom: 1px solid var(--line);
+  }
+  .strategy-item:last-of-type{border-bottom:none;}
+  .strategy-icon{
+    flex-shrink:0;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: var(--trail-light);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size: 18px;
+  }
+  .strategy-body h3{
+    margin: 0 0 4px;
+    font-size: 14px;
+    color: var(--trail);
+    font-family: Georgia, serif;
+  }
+  .strategy-body p{
+    margin:0;
+    font-size: 13px;
+    color: var(--ink-soft);
+    line-height:1.55;
+  }
+  .strategy-body ul{
+    margin: 6px 0 0;
+    padding-left: 18px;
+    font-size: 12.5px;
+    color: var(--ink-soft);
+  }
+  .strategy-body ul li{margin-bottom:3px;}
+  .strategy-closing{
+    margin-top: 16px;
+    padding: 14px 16px;
+    background: var(--amber);
+    color: #16323A;
+    border-radius: 12px;
+    font-size: 13.5px;
+    font-weight:600;
+    text-align:center;
+  }
+  .strategy-source{
+    margin-top: 10px;
+    font-size: 11px;
+    color: var(--ink-soft);
+    font-style: italic;
+  }
+  .strategy-link{
+    display:inline-block;
+    margin-top: 6px;
+    font-size: 12px;
+    font-weight:700;
+    color: var(--trail);
+    text-decoration: underline;
+  }
+
+  .print-btn{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    margin-top: 4px;
+    margin-left: 10px;
+    background: var(--trail);
+    border: none;
+    color: #EAF4F1;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight:700;
+    cursor:pointer;
+  }
+  .print-btn:hover{background:#163E4A;}
+
+  #print-header{display:none;}
+
+  @media print{
+    @page{ size: A4 landscape; margin: 10mm; }
+    body{padding:0; background:#fff;}
+    .hero, .no-print, button{display:none !important;}
+    #print-header{
+      display:block !important;
+      margin-bottom: 18px;
+    }
+    #print-header h1{
+      font-family: Georgia, serif;
+      font-size: 22px;
+      margin: 0 0 4px;
+      color: #16323A;
+    }
+    #print-header p{
+      margin: 0;
+      font-size: 13px;
+      color: #333;
+    }
+    .card{
+      box-shadow:none;
+      border: 1px solid #ccc;
+      break-inside: avoid;
+    }
+    .table-scroll{ overflow: visible !important; border:none; }
+    #grade-table{ width:100% !important; min-width:0 !important; table-layout: fixed; font-size: 10px; }
+    #grade-table th, #grade-table td{ padding: 4px 3px; }
+    #grade-table td input[type=number]{ width:100%; padding:3px 2px; font-size: 10px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="hero no-print">
+    <h1>Jejak Nilaiku</h1>
+    <p class="sub">"Aku, Nilai, dan Arah Langkahku" — melacak perjalanan nilai rapor dari semester ke semester.</p>
+    <div class="trail-row" id="trail-row"></div>
+  </div>
+
+  <div id="print-header">
+    <h1>Jejak Nilaiku — Rekap Nilai Rapor</h1>
+    <p id="print-identity"></p>
+  </div>
+
+  <div class="card no-print">
+    <h2>Identitas Siswa</h2>
+    <p class="hint">Lengkapi data diri sebelum mengisi nilai rapor.</p>
+    <div class="id-grid">
+      <div class="field"><label>Nama <span class="req">*</span></label><input type="text" id="nama" placeholder="Nama lengkap" required oninput="this.classList.remove('field-error')"></div>
+      <div class="field"><label>No. Induk (4 angka) <span class="req">*</span></label><input type="text" id="induk" placeholder="Contoh: 1234" required maxlength="4" inputmode="numeric" oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,4); this.classList.remove('field-error')"></div>
+      <div class="field"><label>Kelas <span class="req">*</span></label><select id="kelas" required onchange="this.classList.remove('field-error')">
+        <option value="">-- Pilih Kelas --</option>
+        <option value="9A">9A</option>
+        <option value="9B">9B</option>
+        <option value="9C">9C</option>
+        <option value="9D">9D</option>
+        <option value="9E">9E</option>
+        <option value="9F">9F</option>
+        <option value="9G">9G</option>
+        <option value="9H">9H</option>
+        <option value="9I">9I</option>
+        <option value="9J">9J</option>
+      </select></div>
+      <div class="field"><label>No. Absen <span class="req">*</span></label><input type="text" id="absen" placeholder="Nomor absen" required oninput="this.classList.remove('field-error')"></div>
+    </div>
+    <div id="identity-warning"></div>
+  </div>
+
+  <div class="card" id="grade-card">
+    <h2>Nilai Rapor per Mata Pelajaran</h2>
+    <p class="hint">Isi nilai untuk tiap semester (0–100). Nilai rata-rata dan gabungan dihitung otomatis.</p>
+    <div class="table-scroll">
+      <table id="grade-table"></table>
+    </div>
+    <p class="note">Catatan: <b>khusus Semester 5</b>, jika nilai belum diisi atau ditulis "0", semester tersebut <b>tidak ikut dihitung</b> dalam rata-rata mata pelajaran maupun nilai gabungan.</p>
+
+    <button type="button" class="reset-btn no-print" onclick="resetAll()">Reset semua nilai</button>
+    <button type="button" class="print-btn no-print" onclick="cetakHasil()">🖨️ Cetak / Simpan sebagai PDF</button>
+  </div>
+
+  <div class="card no-print">
+    <h2>Simulasi Nilai Akhir Akademik</h2>
+    <p class="hint">Nilai Akhir Akademik = 60% Nilai Rapor (gabungan) + 40% Nilai TKA.</p>
+
+    <div class="sim-grid">
+      <div class="sim-box">
+        <label>Nilai Rapor (Gabungan Smt 1–5)</label>
+        <input type="text" id="raport-sim" readonly value="0.00">
+        <span class="weight-tag">Bobot 60%</span>
+      </div>
+      <div class="sim-box">
+        <label>Perkiraan Nilai TKA per Mapel</label>
+        <div id="tka-subject-list"></div>
+        <div id="tka-extra-list"></div>
+        <button type="button" class="add-mapel-btn" onclick="addTkaSubject()">+ Tambah Mapel TKA</button>
+        <div class="tka-avg">Rata-rata TKA <span id="tka-avg">0.00</span></div>
+        <span class="weight-tag">Bobot 40%</span>
+      </div>
+    </div>
+
+    <div class="result-box">
+      <div>
+        <div class="label">Nilai Akhir Akademik (Simulasi)</div>
+        <div class="big" id="nilai-akhir">0.00</div>
+      </div>
+    </div>
+
+    <div class="target-row">
+      <p class="hint target-hint">Ingin tahu berapa nilai TKA minimal yang dibutuhkan? Masukkan target Nilai Akhir Akademik.</p>
+      <div class="flex">
+        <div class="field">
+          <label>Target Nilai Akhir Akademik</label>
+          <input type="number" id="target-input" min="0" max="100" placeholder="Contoh: 85" oninput="calcSimulasi()">
+        </div>
+      </div>
+      <div id="target-result"></div>
+    </div>
+  </div>
+
+  <div class="card no-print">
+    <h2>Estimasi Peluang ke Sekolah Negeri</h2>
+    <p class="hint">Perbandingan Nilai Akhir Akademik (simulasi) dengan estimasi batas minimal (passing grade) tahun sebelumnya. Angka ini bersifat <b>referensi/estimasi</b>, bukan angka resmi — batas minimal setiap tahun bisa berubah tergantung kuota dan jumlah pendaftar.</p>
+    <div id="school-benchmark-list"></div>
+  </div>
+
+  <div class="card no-print">
+    <h2>Cek Kelayakan ke Sekolah Swasta/Madrasah Aliyah/SMAplus</h2>
+    <p class="hint">Syarat sekolah berikut memakai kriteria nilai per mata pelajaran, bukan sekadar Nilai Akhir Akademik SPMB — jadi dihitung langsung dari tabel Nilai Rapor di atas. Bersifat <b>referensi</b> dari informasi PPDB masing-masing sekolah dan dapat berubah setiap tahun.</p>
+    <div class="reference-box">
+      Untuk verifikasi info pendidikan resmi terkini di Jawa Timur, Bapak/Ibu &amp; siswa juga bisa memeriksa:
+      <br>• <a href="https://bbpmpjatim.kemendikdasmen.go.id/main/" target="_blank" rel="noopener noreferrer">BBPMP Jatim (Kemendikdasmen)</a> — Balai Besar Penjaminan Mutu Pendidikan Jawa Timur.
+      <br>• <a href="https://ppsmk.dindik.jatimprov.go.id/" target="_blank" rel="noopener noreferrer">Aksi Bisa (Dindik Jatim)</a> — portal informasi SMK/SMA Dinas Pendidikan Provinsi Jawa Timur.
+    </div>
+    <div id="special-school-list"></div>
+  </div>
+
+  <div class="card no-print" id="strategi-section">
+    <h2>Strategi &amp; Motivasi Jika Belum Mencapai Target</h2>
+    <div class="strategy-intro">
+      Kalau hasil simulasi di atas belum mencapai target atau estimasi batas minimal sekolah tujuan, itu <b>bukan vonis akhir</b> — melainkan titik awal untuk menyusun strategi belajar yang lebih terarah. Berikut lima pendekatan yang didukung riset psikologi pendidikan.
+    </div>
+
+    <div class="strategy-item">
+      <div class="strategy-icon">🌱</div>
+      <div class="strategy-body">
+        <h3>1. Growth Mindset — Kemampuan Bisa Berkembang</h3>
+        <p>Riset Carol Dweck menunjukkan bahwa siswa yang meyakini kemampuannya bisa berkembang lewat usaha dan strategi belajar yang tepat (bukan bakat bawaan semata) lebih percaya diri menghadapi kegagalan dan lebih termotivasi untuk terus belajar. Anggap nilai yang belum memenuhi target sebagai <b>informasi arah belajar</b>, bukan label tentang siapa dirimu.</p>
+      </div>
+    </div>
+
+    <div class="strategy-item">
+      <div class="strategy-icon">🎯</div>
+      <div class="strategy-body">
+        <h3>2. Pecah Target Besar Jadi Langkah Kecil</h3>
+        <p>Daripada terpaku pada satu angka besar, susun target mingguan yang lebih kecil dan terukur — misalnya menambah beberapa poin di satu mata pelajaran lewat latihan soal rutin. Pencapaian kecil yang konsisten membangun rasa mampu (self-efficacy) yang mendorong semangat belajar berikutnya.</p>
+      </div>
+    </div>
+
+    <div class="strategy-item">
+      <div class="strategy-icon">💪</div>
+      <div class="strategy-body">
+        <h3>3. Bangun Resiliensi Akademik (Model 5C)</h3>
+        <p>Martin &amp; Marsh merangkum resiliensi akademik dalam lima dimensi yang bisa dilatih:</p>
+        <ul>
+          <li><b>Confidence</b> — percaya usaha konsisten akan membuahkan hasil.</li>
+          <li><b>Control</b> — fokus pada hal yang bisa dikendalikan (jam belajar, latihan soal), bukan hal di luar kendali.</li>
+          <li><b>Composure</b> — kelola kecemasan dengan istirahat cukup dan napas tenang sebelum belajar/ujian.</li>
+          <li><b>Commitment</b> — tetap disiplin dengan jadwal belajar meski hasil belum sesuai harapan.</li>
+          <li><b>Coordination</b> — evaluasi dan ganti strategi belajar bila cara lama belum efektif.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="strategy-item">
+      <div class="strategy-icon">🤍</div>
+      <div class="strategy-body">
+        <h3>4. Bersikap Baik pada Diri Sendiri (Self-Compassion)</h3>
+        <p>Riset Kristin Neff menunjukkan bahwa bersikap suportif pada diri sendiri saat gagal — bukan mengkritik diri berlebihan — justru meningkatkan dorongan untuk bangkit dan mencoba lagi. Bicaralah pada diri sendiri seperti kamu menyemangati sahabat yang sedang kesulitan, bukan seperti menghakimi.</p>
+      </div>
+    </div>
+
+    <div class="strategy-item">
+      <div class="strategy-icon">🗣️</div>
+      <div class="strategy-body">
+        <h3>5. Cari Dukungan, Jangan Dipendam Sendiri</h3>
+        <p>Ceritakan progres dan kekhawatiranmu ke guru BK, guru mata pelajaran, atau orang tua. Dukungan sosial yang hangat terbukti memperkuat resiliensi akademik dan membantu siswa menemukan strategi belajar yang lebih tepat sasaran.</p>
+      </div>
+    </div>
+
+    <div class="strategy-closing">
+      Nilai simulasi hari ini adalah titik awal untuk menyusun langkah — bukan penentu akhir masa depanmu. 🌟
+    </div>
+    <p class="strategy-source">Disarikan dari riset Carol Dweck (growth mindset), Angela Duckworth (grit), Andrew Martin &amp; Herbert Marsh (resiliensi akademik/model 5C), dan Kristin Neff (self-compassion) di bidang psikologi pendidikan.</p>
+  </div>
+
+  <div class="card" id="strategi-belajar-section">
+    <h2>Strategi Belajar Efektif</h2>
+    <div class="strategy-intro">
+      Tidak semua cara belajar sama efektifnya. Berdasarkan tinjauan besar riset psikologi kognitif dan pendidikan terhadap sepuluh teknik belajar (Dunlosky dkk., 2013, <i>Psychological Science in the Public Interest</i>; dikonfirmasi ulang oleh Hattie &amp; Donoghue, 2021), berikut teknik-teknik dengan bukti manfaat paling kuat.
+    </div>
+
+    <div class="strategy-item">
+      <div class="strategy-icon">🔁</div>
+      <div class="strategy-body">
+        <h3>1. Retrieval Practice — Latihan Mengingat Aktif</h3>
+        <p>Uji dirimu sendiri (mengerjakan soal latihan, membuat flashcard, atau menutup buku lalu mencoba mengingat) terbukti jauh lebih efektif untuk daya ingat jangka panjang dibanding membaca ulang catatan secara pasif. Teknik ini juga terbukti mengurangi kecemasan menghadapi ujian, bukan menambahnya.</p>
+      </div>
+    </div>
+
+    <div class="strategy-item">
+      <div class="strategy-icon">📅</div>
+      <div class="strategy-body">
+        <h3>2. Spaced Practice — Belajar Dicicil, Bukan Kebut Semalam</h3>
+        <p>Mencicil waktu belajar dalam beberapa sesi terpisah (misalnya 30 menit tiap hari selama seminggu) menghasilkan daya ingat yang jauh lebih tahan lama dibanding belajar maraton dalam satu waktu menjelang ujian (sistem kebut semalam).</p>
+      </div>
+    </div>
+
+    <div class="strategy-item">
+      <div class="strategy-icon">🔀</div>
+      <div class="strategy-body">
+        <h3>3. Interleaving — Menyelingi Materi/Jenis Soal</h3>
+        <p>Mencampur latihan soal dari beberapa topik atau mata pelajaran berbeda dalam satu sesi belajar (bukan satu topik terus-menerus) terasa lebih sulit saat berlatih, tapi terbukti membuat pemahaman lebih kuat saat diuji di kemudian hari.</p>
+      </div>
+    </div>
+
+    <div class="strategy-item">
+      <div class="strategy-icon">💬</div>
+      <div class="strategy-body">
+        <h3>4. Elaborative Interrogation &amp; Self-Explanation</h3>
+        <p>Saat belajar, biasakan bertanya "mengapa" dan "bagaimana" hal ini bisa terjadi, lalu jelaskan konsepnya dengan kata-katamu sendiri seolah mengajari orang lain. Cara ini memaksa otak memproses materi lebih dalam, bukan sekadar menghafal permukaan.</p>
+      </div>
+    </div>
+
+    <div class="strategy-item">
+      <div class="strategy-icon">⏱️</div>
+      <div class="strategy-body">
+        <h3>5. Kelola Waktu dengan Teknik Pomodoro</h3>
+        <p>Belajar fokus selama 25 menit tanpa gangguan, lalu istirahat 5 menit, dan ulangi beberapa siklus. Teknik manajemen waktu ini membantu menjaga konsentrasi tetap tinggi dan mencegah kelelahan mental saat sesi belajar panjang.</p>
+      </div>
+    </div>
+
+    <div class="strategy-item">
+      <div class="strategy-icon">🎯</div>
+      <div class="strategy-body">
+        <h3>6. Hindari Sekadar Membaca Ulang &amp; Menggarisbawahi</h3>
+        <p>Riset menunjukkan membaca ulang dan menggarisbawahi teks memberi rasa familiar yang menipu — terasa sudah paham, padahal daya ingatnya rendah. Gunakan sebagai pelengkap awal saja, bukan metode belajar utama.</p>
+      </div>
+    </div>
+
+    <div class="strategy-closing">
+      Cara belajar yang tepat sama pentingnya dengan jam belajar itu sendiri. 📚
+    </div>
+    <p class="strategy-source">Disarikan dari Dunlosky, Rawson, Marsh, Nathan, &amp; Willingham (2013), <i>Improving Students' Learning With Effective Learning Techniques</i>, Psychological Science in the Public Interest, serta replikasi meta-analisis Hattie &amp; Donoghue (2021).</p>
+  </div>
+
+</div>
+
+<script>
+// URL Web App Google Apps Script — sudah ditetapkan tetap, tidak perlu diisi manual.
+const GS_WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbwDYkDEiNxIv9pVHDbsDW9I6d2PzLUjeUY5nl8fLR-x0j7FOZgkRjv8-8dNyHX_usSe/exec';
+
+const subjects = [
+  {id:'pai',   label:'PAI',          color:'#0F4C5C'},
+  {id:'siroh', label:'Siroh',        color:'#3A7D7F'},
+  {id:'pkn',   label:'PKN',          color:'#6A4C93'},
+  {id:'indo',  label:'Bhs Indo',     color:'#1F9E6D'},
+  {id:'mtk',   label:'Matematika',   color:'#D9A02A'},
+  {id:'ipa',   label:'IPA',          color:'#C0455B'},
+  {id:'ips',   label:'IPS',          color:'#D97B2C'},
+  {id:'ing',   label:'Bhs Inggris',  color:'#6C757D'}
+];
+const semesters = [1,2,3,4,5];
+
+// Mapel TKA (Tes Kemampuan Akademik). Untuk menambah mapel TKA baru di kemudian
+// hari (misal ada tambahan IPA), cukup tambahkan satu baris objek di sini —
+// seluruh perhitungan rata-rata TKA akan otomatis menyesuaikan.
+const tkaSubjects = [
+  {id:'mtk',  label:'Matematika'},
+  {id:'indo', label:'Bahasa Indonesia'}
+  // ,{id:'ipa', label:'IPA'}  <-- contoh cara menambah mapel TKA baru
+];
+
+// Estimasi batas minimal (passing grade) sekolah tujuan, berdasarkan data tahun
+// sebelumnya — bersifat referensi. Untuk menambah sekolah baru, cukup tambahkan
+// satu baris objek {name, min, max} di sini.
+const schoolBenchmarks = [
+  {name:'SMAN 5 Surabaya',  min:93.00, max:93.50, website:'https://sman5sby.sch.id'},
+  {name:'SMAN 1 Surabaya',  min:92.50, max:93.50, website:'https://sman1sby.sch.id'},
+  {name:'SMAN 2 Surabaya',  min:92.50, max:92.75, website:'https://sman2-sby.sch.id'},
+  {name:'SMAN 6 Surabaya',  min:92.05, max:93.43, website:'https://sman6sby.sch.id'},
+  {name:'SMAN 16 Surabaya', min:91.70, max:93.10, website:'https://sman16-sby.sch.id'},
+  {name:'SMAN 9 Surabaya',  min:91.30, max:92.20, website:'https://sman9sby.sch.id'},
+  {name:'SMAN 15 Surabaya', min:89.50, max:90.50, website:'https://sman15-sby.sch.id'}
+  // ,{name:'SMAN ... Surabaya', min:0, max:0, website:'https://...'}  <-- contoh cara menambah sekolah baru
+];
+
+function buildSchoolBenchmarks(){
+  const container = document.getElementById('school-benchmark-list');
+  let html = '';
+  schoolBenchmarks.forEach((sch, i) => {
+    html += `<div class="school-row">
+      <div class="school-name">${sch.name}${sch.website ? `<br><a class="school-website-link" href="${sch.website}" target="_blank" rel="noopener noreferrer">${sch.website.replace(/^https?:\/\//,'')} ↗</a>` : ''}</div>
+      <div class="school-range">Estimasi ${sch.min.toFixed(2)} – ${sch.max.toFixed(2)}</div>
+      <div class="school-status neutral" id="school-status-${i}">–</div>
+    </div>`;
+  });
+  container.innerHTML = html;
+}
+
+function updateSchoolEstimates(akhir){
+  schoolBenchmarks.forEach((sch, i) => {
+    const statusEl = document.getElementById(`school-status-${i}`);
+    if(!statusEl) return;
+    if(akhir >= sch.min){
+      statusEl.textContent = 'Berpeluang lolos';
+      statusEl.className = 'school-status ok';
+    } else {
+      const selisih = (sch.min - akhir).toFixed(2);
+      statusEl.textContent = `Kurang ${selisih} poin`;
+      statusEl.className = 'school-status warn';
+    }
+  });
+}
+
+// Sekolah berasrama/semi-militer dengan syarat berbasis nilai per mata pelajaran
+// (bukan sekadar Nilai Akhir Akademik). Untuk menambah sekolah baru, tambahkan
+// satu objek {name, jalur:[...]} di sini. Tiap "jalur" bisa memakai:
+//  - coreSubjects: daftar id mapel yang dicek (lihat array `subjects` di atas)
+//  - allSubjects: true jika rata-rata dihitung dari seluruh mapel di rapor
+//  - minAvg: syarat rata-rata kumulatif
+//  - minPerSubjectPerSemester: syarat nilai tiap mapel di tiap semester (batas bawah ketat)
+//  - minPerSubjectOverall: syarat rata-rata tiap mapel inti (bukan per semester)
+//  - semesterRange: [semester_awal, semester_akhir] yang dihitung
+//  - softSuggestion: catatan anjuran yang tidak menggugurkan
+const specialSchools = [
+  {
+    name: 'SMA Al Hikmah Surabaya',
+    website: 'https://sma.alhikmahsby.sch.id',
+    garuda: true,
+    jalur: [
+      {
+        label: 'Syarat Nilai Rapor Kelas 8 (Jalur Reguler)',
+        coreSubjects: ['indo','ing','mtk','ipa','ips'],
+        minAvg: 85,
+        semesterRange: [3,4],
+        softSuggestion: 'Selain nilai rapor, turut dipertimbangkan peringkat paralel 15% terbaik di kelas 8 dari sekolah asal. Tersedia juga jalur prestasi Tahfidh (minimal hafalan 3 juz Al-Qur\'an) dan Jalur Tes Tulis berdasarkan nilai rapor dan peringkat.'
+      }
+    ]
+  },
+  {
+    name: 'SMA Ciputra Surabaya (Sekolah Ciputra)',
+    website: 'https://www.sekolahciputra.sch.id',
+    jalur: [
+      {
+        label: 'Syarat Akademik & Bahasa Inggris',
+        allSubjects: true,
+        minAvg: 0,
+        semesterRange: [1,5],
+        infoOnly: true,
+        softSuggestion: 'Tidak ada publikasi resmi nilai rapor minimal — kelulusan murni ditentukan tes akademik dan wawancara, ditambah syarat skor TOEFL minimal 500 karena pengantar pembelajaran berbahasa Inggris (mengikuti kurikulum internasional IB/International Baccalaureate). Persiapkan kemampuan Bahasa Inggris sejak dini.'
+      }
+    ]
+  },
+  {
+    name: 'SMA Taruna Nusantara (Magelang)',
+    website: 'https://tarunanusantara.sch.id',
+    garuda: true,
+    jalur: [
+      {
+        label: 'Jalur Reguler',
+        coreSubjects: ['indo','ing','mtk','ipa'],
+        minAvg: 85,
+        minPerSubjectPerSemester: 80,
+        semesterRange: [1,5]
+      },
+      {
+        label: 'Jalur Prestasi (min. tingkat kota/kabupaten) / Ketua OSIS',
+        coreSubjects: ['indo','ing','mtk','ipa'],
+        minAvg: 80,
+        minPerSubjectPerSemester: 75,
+        semesterRange: [1,5]
+      }
+    ]
+  },
+  {
+    name: 'SMA Terpadu Krida Nusantara (Bandung)',
+    website: 'https://www.kridanusantara.com',
+    jalur: [
+      {
+        label: 'Jalur Reguler',
+        allSubjects: true,
+        minAvg: 80,
+        coreSubjects: ['mtk','ipa','ips','indo','ing'],
+        minPerSubjectOverall: 70,
+        semesterRange: [1,4]
+      },
+      {
+        label: 'Jalur Beasiswa Penuh/Subsidi',
+        allSubjects: true,
+        minAvg: 80,
+        coreSubjects: ['mtk','ipa','ips','indo','ing'],
+        minPerSubjectOverall: 80,
+        semesterRange: [1,4]
+      }
+    ]
+  },
+  {
+    name: 'SMAN Taruna Nala (Malang)',
+    website: 'https://www.smantarunajatim.sch.id',
+    jalur: [
+      {
+        label: 'Kelayakan Administrasi Awal',
+        allSubjects: true,
+        minAvg: 80,
+        semesterRange: [1,5],
+        softSuggestion: 'Tidak ada batas kaku per mapel, namun disarankan nilai tiap mata pelajaran tidak di bawah 70–75 agar aman di seleksi administrasi awal.'
+      }
+    ]
+  },
+  {
+    name: 'MAN Insan Cendekia (IC) Serpong',
+    website: 'https://ic.sch.id',
+    jalur: [
+      {
+        label: 'Syarat Nilai Rapor (Seleksi Berkas)',
+        coreSubjects: ['mtk','ipa','ips','ing','indo'],
+        minAvg: 85,
+        semesterRange: [1,5],
+        softSuggestion: 'Nilai rapor hanya syarat seleksi berkas (rentang aman rata-rata 85–90). Kelulusan akhir murni ditentukan peringkat hasil Computer Based Test (CBT) nasional SNPDB — meliputi Tes Potensi Belajar dan Tes Akademik — dengan estimasi skor aman > 75–80 dari skala 100, bukan dari nilai rapor semata.'
+      }
+    ]
+  },
+  {
+    name: 'MAN 2 Kota Malang',
+    website: 'https://man2kotamalang.sch.id',
+    garuda: true,
+    jalur: [
+      {
+        label: 'Jalur Undangan / Prestasi',
+        allSubjects: true,
+        minAvg: 80,
+        semesterRange: [3,5],
+        softSuggestion: 'Kelulusan akhir tetap ditentukan akumulasi bobot Tes Akademik (CBT), Tes Psikologi, dan Tes Baca Tulis Al-Qur\'an (BTQ). Estimasi nilai aman CBT reguler berkisar > 75.'
+      },
+      {
+        label: 'Jalur Reguler / Afirmasi',
+        allSubjects: true,
+        minAvg: 78,
+        semesterRange: [3,5],
+        softSuggestion: 'Kelulusan akhir tetap ditentukan akumulasi bobot Tes Akademik (CBT), Tes Psikologi, dan Tes BTQ. Estimasi nilai aman CBT reguler berkisar > 75.'
+      }
+    ]
+  }
+];
+
+function subjectLabel(id){
+  const found = subjects.find(s => s.id === id);
+  return found ? found.label : id;
+}
+
+function evaluateJalur(crit){
+  const semRange = crit.semesterRange || [1,5];
+  const subjectIds = crit.allSubjects ? subjects.map(s => s.id) : crit.coreSubjects;
+
+  let vals = [];
+  subjectIds.forEach(sid => {
+    for(let sem = semRange[0]; sem <= semRange[1]; sem++){
+      const el = document.getElementById(`val-${sid}-${sem}`);
+      if(!el) return;
+      const v = parseFloat(el.value);
+      if(!isNaN(v) && v > 0) vals.push(v);
+    }
+  });
+  const avg = vals.length ? vals.reduce((a,b) => a+b, 0) / vals.length : 0;
+
+  let failItems = [];
+
+  if(crit.minPerSubjectPerSemester){
+    crit.coreSubjects.forEach(sid => {
+      for(let sem = semRange[0]; sem <= semRange[1]; sem++){
+        const el = document.getElementById(`val-${sid}-${sem}`);
+        const v = parseFloat(el.value);
+        if(!isNaN(v) && v > 0 && v < crit.minPerSubjectPerSemester){
+          failItems.push(`${subjectLabel(sid)} Smt ${sem}: ${v} (min ${crit.minPerSubjectPerSemester})`);
+        }
+      }
+    });
+  }
+
+  if(crit.minPerSubjectOverall){
+    crit.coreSubjects.forEach(sid => {
+      let subVals = [];
+      for(let sem = semRange[0]; sem <= semRange[1]; sem++){
+        const el = document.getElementById(`val-${sid}-${sem}`);
+        const v = parseFloat(el.value);
+        if(!isNaN(v) && v > 0) subVals.push(v);
+      }
+      const subAvg = subVals.length ? subVals.reduce((a,b) => a+b, 0) / subVals.length : 0;
+      if(subVals.length && subAvg < crit.minPerSubjectOverall){
+        failItems.push(`Rata-rata ${subjectLabel(sid)}: ${subAvg.toFixed(1)} (min ${crit.minPerSubjectOverall})`);
+      }
+    });
+  }
+
+  const passAvg = avg >= crit.minAvg;
+  const pass = passAvg && failItems.length === 0;
+  return { avg, pass, failItems };
+}
+
+function buildSpecialSchools(){
+  const container = document.getElementById('special-school-list');
+  let html = '';
+  specialSchools.forEach((sch, si) => {
+    const badge = sch.garuda ? `<span class="garuda-badge">🦅 SMA Unggul Garuda Transformasi</span>` : '';
+    html += `<div class="special-school-block"><div class="special-school-name-row"><div class="special-school-name">${sch.name}</div>${badge}</div>`;
+    if(sch.website){
+      html += `<a class="school-website-link" href="${sch.website}" target="_blank" rel="noopener noreferrer">${sch.website.replace(/^https?:\/\//,'')} ↗</a>`;
+    }
+    sch.jalur.forEach((crit, ji) => {
+      html += `<div class="jalur-row" id="jalur-${si}-${ji}">
+        <div class="jalur-top">
+          <div class="jalur-label">${crit.label}</div>
+          <div class="jalur-status neutral" id="jalur-status-${si}-${ji}">–</div>
+        </div>
+        <div class="jalur-detail" id="jalur-detail-${si}-${ji}"></div>
+      </div>`;
+    });
+    html += `</div>`;
+  });
+  container.innerHTML = html;
+}
+
+function updateSpecialSchools(){
+  specialSchools.forEach((sch, si) => {
+    sch.jalur.forEach((crit, ji) => {
+      const result = evaluateJalur(crit);
+      const statusEl = document.getElementById(`jalur-status-${si}-${ji}`);
+      const detailEl = document.getElementById(`jalur-detail-${si}-${ji}`);
+      if(!statusEl || !detailEl) return;
+
+      statusEl.textContent = crit.infoOnly ? 'Lihat catatan' : (result.pass ? 'Memenuhi syarat' : 'Belum memenuhi');
+      statusEl.className = 'jalur-status ' + (crit.infoOnly ? 'neutral' : (result.pass ? 'ok' : 'warn'));
+
+      let detailHtml = `Rata-rata: ${result.avg.toFixed(2)} (min ${crit.minAvg})`;
+      if(result.failItems.length){
+        detailHtml += `<ul class="fail-list">${result.failItems.map(f => `<li>${f}</li>`).join('')}</ul>`;
+      }
+      if(crit.softSuggestion){
+        detailHtml += `<div class="soft-note">${crit.softSuggestion}</div>`;
+      }
+      detailEl.innerHTML = detailHtml;
+    });
+  });
+}
+
+function buildTkaInputs(){
+  const container = document.getElementById('tka-subject-list');
+  let html = '';
+  tkaSubjects.forEach(s => {
+    html += `<div class="tka-row"><label>${s.label}</label><input type="number" min="0" max="100" id="tka-${s.id}" placeholder="0–100" oninput="calcSimulasi()"></div>`;
+  });
+  container.innerHTML = html;
+}
+
+// Mapel TKA tambahan yang bisa diisi bebas oleh pengguna (tanpa perlu edit kode),
+// untuk berjaga-jaga jika nanti ada kepastian penambahan mapel TKA.
+let extraTkaCounter = 0;
+let extraTkaIds = [];
+
+function addTkaSubject(){
+  const id = 'extra' + (extraTkaCounter++);
+  extraTkaIds.push(id);
+  const container = document.getElementById('tka-extra-list');
+  const row = document.createElement('div');
+  row.className = 'tka-row extra-row';
+  row.setAttribute('data-id', id);
+  row.innerHTML = `<input type="text" id="label-${id}" placeholder="Nama mapel (mis. IPA)">
+    <input type="number" min="0" max="100" id="tka-${id}" placeholder="0–100" oninput="calcSimulasi()">
+    <button type="button" class="remove-mapel-btn" onclick="removeTkaSubject('${id}')" title="Hapus mapel">&times;</button>`;
+  container.appendChild(row);
+  calcSimulasi();
+}
+
+function removeTkaSubject(id){
+  extraTkaIds = extraTkaIds.filter(x => x !== id);
+  const row = document.querySelector(`.extra-row[data-id="${id}"]`);
+  if(row) row.remove();
+  calcSimulasi();
+}
+
+function buildTrail(){
+  const row = document.getElementById('trail-row');
+  let html = '';
+  semesters.forEach((s, i) => {
+    html += `<div class="trail-node"><div class="footprint">S${s}</div><span>Smt ${s}</span></div>`;
+    if(i < semesters.length - 1) html += `<div class="trail-dash"></div>`;
+  });
+  row.innerHTML = html;
+}
+
+function buildTable(){
+  const table = document.getElementById('grade-table');
+  let thead = '<thead><tr class="subject-row"><th rowspan="2">No</th><th rowspan="2">Semester</th>';
+  subjects.forEach(s => thead += `<th style="background:${s.color}">${s.label}</th>`);
+  thead += '</tr><tr class="label-row"></tr></thead>';
+
+  let tbody = '<tbody>';
+  semesters.forEach(sem => {
+    tbody += `<tr><td class="rowlabel">${sem}</td><td class="rowlabel">Semester ${sem}</td>`;
+    subjects.forEach(s => {
+      tbody += `<td><input type="number" min="0" max="100" id="val-${s.id}-${sem}" oninput="calcAll()"></td>`;
+    });
+    tbody += '</tr>';
+  });
+
+  tbody += '<tr class="summary"><td class="rowlabel" colspan="2">Jumlah Nilai</td>';
+  subjects.forEach(s => tbody += `<td id="jml-${s.id}">0</td>`);
+  tbody += '</tr>';
+
+  tbody += '<tr class="summary"><td class="rowlabel" colspan="2">Nilai Rata-rata Mapel</td>';
+  subjects.forEach(s => tbody += `<td id="rata-${s.id}">0.00</td>`);
+  tbody += '</tr>';
+
+  tbody += `<tr class="final"><td colspan="2">Nilai Gabungan Rerata Rapor Smt 1-5</td><td colspan="${subjects.length}" id="gabungan">0.00</td></tr>`;
+  tbody += '</tbody>';
+
+  table.innerHTML = thead + tbody;
+}
+
+function calcAll(){
+  let rataArr = [];
+  subjects.forEach(s => {
+    let vals = [];
+    semesters.forEach(sem => {
+      const el = document.getElementById(`val-${s.id}-${sem}`);
+      const v = parseFloat(el.value);
+      if(!isNaN(v) && v > 0) vals.push(v);
+    });
+    const jumlah = vals.reduce((a,b) => a+b, 0);
+    const rata = vals.length ? jumlah / vals.length : 0;
+    document.getElementById(`jml-${s.id}`).textContent = jumlah.toFixed(2);
+    document.getElementById(`rata-${s.id}`).textContent = rata.toFixed(2);
+    if(vals.length) rataArr.push(rata);
+  });
+  const gabungan = rataArr.length ? rataArr.reduce((a,b) => a+b, 0) / rataArr.length : 0;
+  document.getElementById('gabungan').textContent = gabungan.toFixed(2);
+  document.getElementById('raport-sim').value = gabungan.toFixed(2);
+  updateSpecialSchools();
+  calcSimulasi();
+}
+
+function calcSimulasi(){
+  const raport = parseFloat(document.getElementById('raport-sim').value) || 0;
+
+  let tkaVals = [];
+  tkaSubjects.forEach(s => {
+    const v = parseFloat(document.getElementById(`tka-${s.id}`).value);
+    if(!isNaN(v) && v > 0) tkaVals.push(v);
+  });
+  extraTkaIds.forEach(id => {
+    const el = document.getElementById(`tka-${id}`);
+    if(!el) return;
+    const v = parseFloat(el.value);
+    if(!isNaN(v) && v > 0) tkaVals.push(v);
+  });
+  const tkaAvg = tkaVals.length ? tkaVals.reduce((a,b) => a+b, 0) / tkaVals.length : 0;
+  document.getElementById('tka-avg').textContent = tkaAvg.toFixed(2);
+
+  const akhir = raport * 0.6 + tkaAvg * 0.4;
+  document.getElementById('nilai-akhir').textContent = akhir.toFixed(2);
+  updateSchoolEstimates(akhir);
+
+  const targetEl = document.getElementById('target-input');
+  const resultEl = document.getElementById('target-result');
+  const targetVal = parseFloat(targetEl.value);
+
+  if(isNaN(targetVal)){
+    resultEl.textContent = '';
+    resultEl.className = '';
+    return;
+  }
+  const needed = (targetVal - raport * 0.6) / 0.4;
+  if(needed <= 0){
+    resultEl.textContent = `Target sudah bisa tercapai hanya dari nilai rapor — nilai TKA berapa pun sudah cukup.`;
+    resultEl.className = 'ok';
+  } else if(needed > 100){
+    resultEl.innerHTML = `Target ${targetVal.toFixed(2)} sulit dicapai: dibutuhkan nilai TKA sekitar ${needed.toFixed(2)}, melebihi nilai maksimal 100.<br><a class="strategy-link" href="#strategi-section">Lihat strategi &amp; motivasi menghadapi ini ↓</a>`;
+    resultEl.className = 'warn';
+  } else {
+    resultEl.textContent = `Dibutuhkan nilai TKA minimal ${needed.toFixed(2)} untuk mencapai target Nilai Akhir Akademik ${targetVal.toFixed(2)}.`;
+    resultEl.className = 'ok';
+  }
+}
+
+function buildSheetPayload(){
+  const headers = ['Nama'];
+  const row = [document.getElementById('nama').value.trim() || '-'];
+
+  subjects.forEach(s => {
+    semesters.forEach(sem => {
+      headers.push(`${s.label} Smt${sem}`);
+      const el = document.getElementById(`val-${s.id}-${sem}`);
+      row.push(el.value || '');
+    });
+    headers.push(`${s.label} Rata-rata`);
+    row.push(document.getElementById(`rata-${s.id}`).textContent);
+  });
+
+  headers.push('Nilai Gabungan Rerata Rapor Smt 1-5');
+  row.push(document.getElementById('gabungan').textContent);
+
+  return { headers, row };
+}
+
+function kirimKeGoogleSheets(){
+  const payload = buildSheetPayload();
+  fetch(GS_WEBAPP_URL, {
+    method: 'POST',
+    mode: 'no-cors',
+    body: JSON.stringify(payload)
+  }).catch(() => {
+    // Dikirim diam-diam di latar belakang; kegagalan tidak ditampilkan ke siswa.
+  });
+}
+
+function validateIdentity(){
+  const ids = ['nama','induk','kelas','absen'];
+  let allFilled = true;
+  ids.forEach(id => {
+    const el = document.getElementById(id);
+    const val = el.value.trim();
+    let isValid = val !== '';
+    if(id === 'induk' && !/^[0-9]{4}$/.test(val)){
+      isValid = false;
+    }
+    if(!isValid){
+      el.classList.add('field-error');
+      allFilled = false;
+    } else {
+      el.classList.remove('field-error');
+    }
+  });
+  return allFilled;
+}
+
+function cetakHasil(){
+  const warningEl = document.getElementById('identity-warning');
+
+  if(!validateIdentity()){
+    warningEl.textContent = 'Lengkapi dulu semua data identitas (Nama, No. Induk 4 angka, Kelas, No. Absen) sebelum mencetak.';
+    document.getElementById('nama').scrollIntoView({behavior:'smooth', block:'center'});
+    return;
+  }
+  warningEl.textContent = '';
+
+  const nama = document.getElementById('nama').value.trim() || '-';
+  const kelas = document.getElementById('kelas').value.trim() || '-';
+  const absen = document.getElementById('absen').value.trim() || '-';
+  const induk = document.getElementById('induk').value.trim() || '-';
+  document.getElementById('print-identity').textContent =
+    `Nama: ${nama}   |   No. Induk: ${induk}   |   Kelas/No. Absen: ${kelas} / ${absen}`;
+
+  const gsUrl = GS_WEBAPP_URL;
+  if(gsUrl){
+    kirimKeGoogleSheets();
+  }
+
+  window.print();
+}
+
+function resetAll(){
+  subjects.forEach(s => {
+    semesters.forEach(sem => {
+      document.getElementById(`val-${s.id}-${sem}`).value = '';
+    });
+  });
+  tkaSubjects.forEach(s => {
+    document.getElementById(`tka-${s.id}`).value = '';
+  });
+  extraTkaIds = [];
+  document.getElementById('tka-extra-list').innerHTML = '';
+  document.getElementById('target-input').value = '';
+  calcAll();
+}
+
+buildTrail();
+buildTable();
+buildTkaInputs();
+buildSchoolBenchmarks();
+buildSpecialSchools();
+calcAll();
+</script>
+</body>
+</html>
