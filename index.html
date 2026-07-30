@@ -1263,8 +1263,13 @@ function calcSimulasi(){
 }
 
 function buildSheetPayload(){
-  const headers = ['Nama'];
-  const row = [document.getElementById('nama').value.trim() || '-'];
+  const headers = ['Nama', 'No. Induk', 'Kelas', 'No. Absen'];
+  const row = [
+    document.getElementById('nama').value.trim() || '-',
+    document.getElementById('induk').value.trim() || '-',
+    document.getElementById('kelas').value.trim() || '-',
+    document.getElementById('absen').value.trim() || '-'
+  ];
 
   subjects.forEach(s => {
     semesters.forEach(sem => {
