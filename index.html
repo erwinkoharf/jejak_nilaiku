@@ -1292,7 +1292,7 @@ function buildTable(){
   semesters.forEach(sem => {
     tbody += `<tr><td class="rowlabel">${sem}</td><td class="rowlabel">Semester ${sem}</td>`;
     subjects.forEach(s => {
-      tbody += `<td><input type="number" min="0" max="100" id="val-${s.id}-${sem}" oninput="this.classList.remove('field-error'); calcAll()"></td>`;
+      tbody += `<td><input type="number" min="0" max="100" id="val-${s.id}-${sem}" oninput="checkGradeRange(this); calcAll()"></td>`;
     });
     tbody += '</tr>';
   });
@@ -1311,6 +1311,16 @@ function buildTable(){
   table.innerHTML = thead + tbody;
 }
 
+function checkGradeRange(el){
+  const v = parseFloat(el.value);
+  if(el.value.trim() !== '' && (isNaN(v) || v < 0 || v > 100)){
+    el.classList.add('field-error');
+    return false;
+  }
+  el.classList.remove('field-error');
+  return true;
+}
+
 function calcAll(){
   let rataArr = [];
 
@@ -1319,7 +1329,10 @@ function calcAll(){
     semesters.forEach(sem => {
       const el = document.getElementById(`val-${s.id}-${sem}`);
       const v = parseFloat(el.value);
-      if(!isNaN(v) && v > 0) vals.push(v);
+      // Nilai di luar rentang 0–100 dianggap tidak valid dan dikecualikan dari
+      // perhitungan (bukan ikut dijumlahkan), supaya salah ketik seperti "899"
+      // tidak merusak rata-rata.
+      if(!isNaN(v) && v > 0 && v <= 100) vals.push(v);
     });
     const jumlah = vals.reduce((a,b) => a+b, 0);
     const rata = vals.length ? jumlah / vals.length : 0;
@@ -1436,21 +1449,24 @@ function validateIdentity(){
 }
 
 function validateGrades(){
-  let allFilled = true;
+  let allValid = true;
   subjects.forEach(s => {
     for(let sem = 1; sem <= 4; sem++){
       const el = document.getElementById(`val-${s.id}-${sem}`);
       if(el.value.trim() === ''){
         el.classList.add('field-error');
-        allFilled = false;
-      } else {
-        el.classList.remove('field-error');
+        allValid = false;
+      } else if(!checkGradeRange(el)){
+        allValid = false;
       }
     }
-    // Semester 5 dikecualikan — boleh kosong, tidak ditandai error.
-    document.getElementById(`val-${s.id}-5`).classList.remove('field-error');
+    // Semester 5 dikecualikan dari wajib-isi, tapi tetap dicek rentangnya jika diisi.
+    const el5 = document.getElementById(`val-${s.id}-5`);
+    if(el5.value.trim() !== '' && !checkGradeRange(el5)){
+      allValid = false;
+    }
   });
-  return allFilled;
+  return allValid;
 }
 
 function cetakHasil(){
@@ -1465,7 +1481,7 @@ function cetakHasil(){
   warningEl.textContent = '';
 
   if(!validateGrades()){
-    gradeWarningEl.textContent = 'Masih ada nilai Semester 1–4 yang belum diisi (ditandai merah pada tabel). Semester 5 boleh dikosongkan.';
+    gradeWarningEl.textContent = 'Masih ada nilai yang belum diisi (Semester 1–4) atau di luar rentang 0–100 (ditandai merah pada tabel). Semester 5 boleh dikosongkan.';
     document.getElementById('grade-table').scrollIntoView({behavior:'smooth', block:'center'});
     return;
   }
