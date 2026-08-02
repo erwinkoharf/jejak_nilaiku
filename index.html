@@ -715,6 +715,7 @@
       <table id="grade-table"></table>
     </div>
     <p class="note">Catatan: <b>khusus Semester 5</b>, jika nilai belum diisi atau ditulis "0", semester tersebut <b>tidak ikut dihitung</b> dalam rata-rata mata pelajaran maupun nilai gabungan.</p>
+    <p class="note">Catatan: sesuai rumus SPMB Jatim, Nilai Gabungan dihitung dari <b>7 kategori</b>: PAI (Pendidikan Agama), Pendidikan Pancasila/PKN, Bhs Indo, Matematika, IPA, IPS, dan Bhs Inggris.</p>
     <div id="grade-warning" class="no-print"></div>
 
     <button type="button" class="reset-btn no-print" onclick="resetAll()">Reset semua nilai</button>
@@ -910,8 +911,7 @@ const GS_WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbwDYkDEiNxIv9pVHD
 
 const subjects = [
   {id:'pai',   label:'PAI',          color:'#0F4C5C'},
-  {id:'siroh', label:'Siroh',        color:'#3A7D7F'},
-  {id:'pkn',   label:'PKN',          color:'#6A4C93'},
+  {id:'pkn',   label:'Pendidikan Pancasila/PKN', color:'#6A4C93'},
   {id:'indo',  label:'Bhs Indo',     color:'#1F9E6D'},
   {id:'mtk',   label:'Matematika',   color:'#D9A02A'},
   {id:'ipa',   label:'IPA',          color:'#C0455B'},
@@ -1313,6 +1313,7 @@ function buildTable(){
 
 function calcAll(){
   let rataArr = [];
+
   subjects.forEach(s => {
     let vals = [];
     semesters.forEach(sem => {
@@ -1326,6 +1327,7 @@ function calcAll(){
     document.getElementById(`rata-${s.id}`).textContent = rata.toFixed(2);
     if(vals.length) rataArr.push(rata);
   });
+
   const gabungan = rataArr.length ? rataArr.reduce((a,b) => a+b, 0) / rataArr.length : 0;
   document.getElementById('gabungan').textContent = gabungan.toFixed(2);
   document.getElementById('raport-sim').value = gabungan.toFixed(2);
