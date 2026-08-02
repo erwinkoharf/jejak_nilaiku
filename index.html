@@ -380,6 +380,12 @@
   .school-row:last-child{border-bottom:none;}
   .school-name{font-size:13.5px; font-weight:700; color:var(--ink);}
   .school-range{font-size:12.5px; color:var(--ink-soft);}
+  .rough-note{
+    font-size: 11px;
+    color: var(--danger);
+    font-style: italic;
+    margin-top: 3px;
+  }
   .school-status{
     font-size: 12.5px;
     font-weight:700;
@@ -755,9 +761,15 @@
   </div>
 
   <div class="card no-print">
-    <h2>Estimasi Peluang ke Sekolah Negeri</h2>
+    <h2>Estimasi Peluang ke SMA Negeri</h2>
     <p class="hint">Perbandingan Nilai Akhir Akademik (simulasi) dengan estimasi batas minimal (passing grade) tahun sebelumnya. Angka ini bersifat <b>referensi/estimasi</b>, bukan angka resmi — batas minimal setiap tahun bisa berubah tergantung kuota dan jumlah pendaftar.</p>
     <div id="school-benchmark-list"></div>
+  </div>
+
+  <div class="card no-print">
+    <h2>Estimasi Peluang ke SMK Negeri</h2>
+    <p class="hint">Perbandingan Nilai Akhir Akademik (simulasi) dengan estimasi batas minimal (passing grade) SMK Negeri tahun sebelumnya. Angka ini bersifat <b>referensi/estimasi</b>, bukan angka resmi. <b>Catatan penting:</b> rentang di bawah adalah gabungan dari seluruh jurusan/kompetensi keahlian di sekolah tersebut — nilai ambang <b>sebenarnya berbeda-beda tiap jurusan</b> (misalnya RPL atau DKV biasanya lebih tinggi dari Perhotelan atau Logistik). Cek jurusan spesifik yang diminati langsung ke sekolah tujuan.</p>
+    <div id="smk-benchmark-list"></div>
   </div>
 
   <div class="card no-print">
@@ -927,9 +939,14 @@ const schoolBenchmarks = [
   {name:'SMAN 6 Surabaya',  min:92.05, max:93.43, website:'https://sman6sby.sch.id'},
   {name:'SMAN 16 Surabaya', min:91.70, max:93.10, website:'https://sman16-sby.sch.id'},
   {name:'SMAN 9 Surabaya',  min:91.30, max:92.20, website:'https://sman9sby.sch.id'},
-  {name:'SMAN 15 Surabaya', min:89.50, max:90.50, website:'https://sman15-sby.sch.id'},
-  {name:'SMKN 1 Surabaya',  min:89.88, max:92.51, website:'https://www.smkn1-sby.sch.id'}
+  {name:'SMAN 15 Surabaya', min:89.50, max:90.50, website:'https://sman15-sby.sch.id'}
   // ,{name:'SMAN ... Surabaya', min:0, max:0, website:'https://...'}  <-- contoh cara menambah sekolah baru
+];
+
+const smkBenchmarks = [
+  {name:'SMKN 1 Surabaya', min:89.88, max:92.51, website:'https://www.smkn1-sby.sch.id'},
+  {name:'SMKN 4 Malang',   min:85.00, max:90.00, website:'https://smkn4malang.sch.id', rough:true}
+  // ,{name:'SMKN ... Surabaya', min:0, max:0, website:'https://...'}  <-- contoh cara menambah SMK baru
 ];
 
 function buildSchoolBenchmarks(){
@@ -948,6 +965,35 @@ function buildSchoolBenchmarks(){
 function updateSchoolEstimates(akhir){
   schoolBenchmarks.forEach((sch, i) => {
     const statusEl = document.getElementById(`school-status-${i}`);
+    if(!statusEl) return;
+    if(akhir >= sch.min){
+      statusEl.textContent = 'Berpeluang lolos';
+      statusEl.className = 'school-status ok';
+    } else {
+      const selisih = (sch.min - akhir).toFixed(2);
+      statusEl.textContent = `Kurang ${selisih} poin`;
+      statusEl.className = 'school-status warn';
+    }
+  });
+}
+
+function buildSmkBenchmarks(){
+  const container = document.getElementById('smk-benchmark-list');
+  let html = '';
+  smkBenchmarks.forEach((sch, i) => {
+    const roughNote = sch.rough ? `<div class="rough-note">Estimasi kasar — data pasti belum ditemukan, sebaiknya cek langsung ke sekolah</div>` : '';
+    html += `<div class="school-row">
+      <div class="school-name">${sch.name}${sch.website ? `<br><a class="school-website-link" href="${sch.website}" target="_blank" rel="noopener noreferrer">${sch.website.replace(/^https?:\/\//,'')} ↗</a>` : ''}</div>
+      <div class="school-range">Estimasi ${sch.min.toFixed(2)} – ${sch.max.toFixed(2)}${roughNote}</div>
+      <div class="school-status neutral" id="smk-status-${i}">–</div>
+    </div>`;
+  });
+  container.innerHTML = html;
+}
+
+function updateSmkEstimates(akhir){
+  smkBenchmarks.forEach((sch, i) => {
+    const statusEl = document.getElementById(`smk-status-${i}`);
     if(!statusEl) return;
     if(akhir >= sch.min){
       statusEl.textContent = 'Berpeluang lolos';
@@ -1086,20 +1132,6 @@ const specialSchools = [
         minAvg: 78,
         semesterRange: [3,5],
         softSuggestion: 'Kelulusan akhir tetap ditentukan akumulasi bobot Tes Akademik (CBT), Tes Psikologi, dan Tes BTQ. Estimasi nilai aman CBT reguler berkisar > 75.'
-      }
-    ]
-  },
-  {
-    name: 'SMKN 4 Malang',
-    website: 'https://smkn4malang.sch.id',
-    jalur: [
-      {
-        label: 'Jalur Prestasi Nilai Akademik',
-        allSubjects: true,
-        minAvg: 0,
-        semesterRange: [1,5],
-        infoOnly: true,
-        softSuggestion: 'SMKN 4 Malang merupakan salah satu SMK Negeri terbaik di Jawa Timur (peringkat provinsi ~128 versi UTBK LTMPT). Skema penilaian sebelumnya berbeda dari sekolah lain di daftar ini: Nilai Akhir = 50% Rerata Nilai Rapor + 20% Nilai Akreditasi SMP asal + 30% Indeks Sekolah asal (bukan 60:40 Rapor:TKA). Belum ditemukan angka pasti nilai ambang terbaru — sebaiknya cek langsung ke laman resmi sekolah saat SPMB dibuka.'
       }
     ]
   }
@@ -1321,6 +1353,7 @@ function calcSimulasi(){
   const akhir = raport * 0.6 + tkaAvg * 0.4;
   document.getElementById('nilai-akhir').textContent = akhir.toFixed(2);
   updateSchoolEstimates(akhir);
+  updateSmkEstimates(akhir);
 
   const targetEl = document.getElementById('target-input');
   const resultEl = document.getElementById('target-result');
@@ -1470,6 +1503,7 @@ buildTrail();
 buildTable();
 buildTkaInputs();
 buildSchoolBenchmarks();
+buildSmkBenchmarks();
 buildSpecialSchools();
 calcAll();
 </script>
