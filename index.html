@@ -750,11 +750,17 @@
     </div>
 
     <div class="target-row">
-      <p class="hint target-hint">Ingin tahu berapa nilai TKA minimal yang dibutuhkan? Masukkan target Nilai Akhir Akademik.</p>
+      <p class="hint target-hint">Ingin tahu berapa nilai TKA minimal yang dibutuhkan? Pilih sekolah incaran, atau isi target sendiri.</p>
       <div class="flex">
         <div class="field">
+          <label>Pilih Sekolah Incaran (opsional)</label>
+          <select id="target-school-select" onchange="applyTargetFromSchool()">
+            <option value="">-- Isi target manual --</option>
+          </select>
+        </div>
+        <div class="field">
           <label>Target Nilai Akhir Akademik</label>
-          <input type="number" id="target-input" min="0" max="100" placeholder="Contoh: 85" oninput="calcSimulasi()">
+          <input type="number" id="target-input" min="0" max="100" placeholder="Contoh: 85" value="85" oninput="calcSimulasi()">
         </div>
       </div>
       <div id="target-result"></div>
@@ -989,6 +995,37 @@ function buildSmkBenchmarks(){
     </div>`;
   });
   container.innerHTML = html;
+}
+
+// Dropdown target di kartu simulasi hanya memuat sekolah yang punya angka
+// estimasi tunggal sebanding dengan rumus 60% Rapor + 40% TKA (SMA & SMK
+// Negeri). Sekolah di kartu "Cek Kelayakan" sengaja TIDAK dimasukkan karena
+// kriteria mereka berbeda struktur (per-mapel, TOEFL, ujian tersendiri, dll)
+// sehingga tidak sebanding untuk dijadikan target Nilai Akhir Akademik di sini.
+function buildTargetSchoolDropdown(){
+  const select = document.getElementById('target-school-select');
+  let html = '<option value="">-- Isi target manual --</option>';
+
+  html += '<optgroup label="SMA Negeri">';
+  schoolBenchmarks.forEach(sch => {
+    html += `<option value="${sch.min.toFixed(2)}">${sch.name} (min ${sch.min.toFixed(2)})</option>`;
+  });
+  html += '</optgroup>';
+
+  html += '<optgroup label="SMK Negeri">';
+  smkBenchmarks.forEach(sch => {
+    html += `<option value="${sch.min.toFixed(2)}">${sch.name} (min ${sch.min.toFixed(2)})</option>`;
+  });
+  html += '</optgroup>';
+
+  select.innerHTML = html;
+}
+
+function applyTargetFromSchool(){
+  const select = document.getElementById('target-school-select');
+  if(select.value === '') return;
+  document.getElementById('target-input').value = select.value;
+  calcSimulasi();
 }
 
 function updateSmkEstimates(akhir){
@@ -1527,6 +1564,7 @@ function resetAll(){
   extraTkaIds = [];
   document.getElementById('tka-extra-list').innerHTML = '';
   document.getElementById('target-input').value = '';
+  document.getElementById('target-school-select').value = '';
   calcAll();
 }
 
@@ -1535,6 +1573,7 @@ buildTable();
 buildTkaInputs();
 buildSchoolBenchmarks();
 buildSmkBenchmarks();
+buildTargetSchoolDropdown();
 buildSpecialSchools();
 calcAll();
 </script>
